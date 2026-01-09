@@ -1,98 +1,158 @@
-# Take Home Task - Romance Novels
+# Book Data Processing Pipeline
 
-You've been hired as a contractor by Adora Enhance, a company that focuses on book marketing in the romance sector. They've asked you to work on developing a data pipeline they use to understand what titles are popular in the genre.
+This project implements a data pipeline for processing raw book data, generating insights, and creating visualizations.
 
-Adora Enhance currently makes use of a web scraping tool to extract data regularly from their sales platform, but this produces a messy and error-filled output. They'd like you to develop the `transform` stage of the pipeline, building a repeatable process that allows them to clean data for analysis.
+## Pipeline Overview
 
-You have two specific tasks to complete:
+The pipeline consists of three main stages:
 
-1. Build a transform script that takes the initial raw scraped data and produces a clean, consistent result
-2. Build an analysis script that takes the processed data and produces simple visualisations from it
+1. **Data Processing**: Raw CSV files from the `data/` folder are cleaned and transformed into a standardized format
+2. **Data Analysis**: The processed data is analyzed to generate visual insights saved to the `visuals/` directory
+3. **Keyword Extraction**: Key terms are extracted from book titles and visualized
 
-There are also two optional tasks; you are welcome to complete either or both as you wish.
+```
+data/RAW_DATA_*.csv → process_raw_data.py → data/processed_data.csv
+                                                    ↓
+                                          analyse_processed_data.py → visuals/*.png
+                                                    ↓
+                                          get_keywords.py → visuals/keywords_chart.png
+```
 
-## Resources
+## Prerequisites
 
-A number of resources are required for this project; these are provided in `data.zip`:
+### Installing Python
 
-- `authors.db`: an SQLite database storing author details (names & numeric IDs)
-- `RAW_DATA_0.csv`: an example file for processing
-- `RAW_DATA_1.csv`: a second example file
-- `RAW_DATA_4.csv`: a third example file
-- `EXAMPLE_DATA_4.csv`: an example of a processed file made using `RAW_DATA_4.csv`
+This project requires Python 3.8 or higher.
 
-## Assessment
+**macOS/Linux:**
+```bash
+# Check if Python is installed
+python3 --version
 
-There are no automated tests to guide you on this assessment. Instead, your code will be holistically assessed on two aspects:
+# If not installed, on macOS use Homebrew:
+brew install python3
 
-- How well does it work?
-- How well is it written?
 
-During this assessment, you should focus on ensuring that you write high-quality, organised code that meets the requirements of the tasks.
+### Installing pip
 
-## Task 1
+pip usually comes with Python 3. Verify installation:
 
-Create a Python script - `process_raw_data.py`. This script should run from the command line and require one argument: the path to a `.csv` file.
+```bash
+pip3 --version
+```
 
-When run, the script should load data from the named file and process it as described below. Files to be processed will always be in the same format as `RAW_DATA_0.csv`, `RAW_DATA_1.CSV`, and `RAW_DATA_4.csv`.
+If pip is not installed:
+```bash
+python3 -m ensurepip --upgrade
+```
 
-The script should produce a single `.csv` file as output named `PROCESSED_DATA.csv`. Any previous `PROCESSED_DATA.csv` file should be overwritten entirely, with the new file only containing data from the current raw data file.
+## Installation
 
-The output file should have the following columns only:
+1. Clone or download this repository
 
-- title
-- author_name
-- year 
-- rating
-- ratings
+2. Navigate to the project directory:
+```bash
+cd Assessment-Take-Home-main
+```
 
-"title" and "author_name" should contain text data; all other columns should be numeric.
+3. Install required dependencies:
+```bash
+pip3 install -r requirements.txt
+```
 
-In the raw data, many book titles also contain series or format information. To handle this, all titles should be cleaned to remove any information in brackets.
+## Usage
 
-Any rows with missing values for author or title should not be included in the output.
+### 1. Process Raw Data
 
-The output should be sorted by descending order of rating.
+The `process_raw_data.py` script cleans and standardizes raw book data files.
 
-`EXAMPLE_DATA_4.csv` shows the result of processing `RAW_DATA_4.csv` as described.
+**What it does:**
+- Removes unnecessary columns and duplicate index columns
+- Drops rows with missing book titles or authors
+- Reformats rating values (converts European decimal format to standard)
+- Cleans the ratings column (removes backticks)
+- Converts data types to appropriate formats
+- Merges author information from the `authors.db` database
+- Renames columns to standardized names
+- Outputs cleaned data to `data/processed_data.csv`
 
-## Task 2
+**Run the script:**
+```bash
+python3 process_raw_data.py data/RAW_DATA_X.csv
+```
 
-Create a second Python script - `analyse_processed_data.py`.
+Or with the short flag:
+```bash
+python3 process_raw_data.py -f data/RAW_DATA_X.csv
+```
 
-When run, this script should load a `PROCESSED_DATA.csv` file and produce the following file outputs:
+### 2. Analyze Processed Data
 
-- `decade_releases.png`: a pie chart showing the proportion of books released in each decade.
-- `top_authors.png`: a sorted bar chart showing the total number of ratings for the ten most-rated authors.
+The `analyse_processed_data.py` script generates visual insights from the processed data.
 
-## Optional Tasks
+**What it does:**
+- Loads `data/processed_data.csv`
+- Adds a decade column for temporal analysis
+- Creates a pie chart showing the proportion of novels by decade
+- Creates a bar chart showing the top 10 most-rated authors
+- Creates a line graph of the number of romance novels released over the years
+- Saves both charts as PNG files to the `visuals/` directory
 
-The following tasks are entirely optional and can be completed in any order or not at all.
+**Run the script:**
+```bash
+python3 analyse_processed_data.py
+```
 
-### [OPTIONAL] Task 3
+**Output:**
+- `visuals/decade_distribution.png` - Pie chart of books by decade
+- `visuals/top_authors.png` - Bar chart of top 10 authors by total ratings
+- `visuals/release_trends_over_time.png` - line graph of number of books released over the years
 
-Create a third Python script - `get_keywords.py`.
+### 3. Extract Keywords
 
-When run, this script should load a `PROCESSED_DATA.csv` file and produce the following file output:
+The `get_keywords.py` script extracts and visualizes common keywords from book titles.
 
-- `top_keywords.png`: a sorted bar chart showing the twenty most common **keywords** across all titles.
+**What it does:**
+- Loads `data/processed_data.csv`
+- Extracts keywords from book titles
+- Counts keyword frequency
+- Creates a bar chart of the most common keywords
+- Saves the visualization to the `visuals/` directory
 
-Use your own judgement when processing and identifying keywords.
+**Run the script:**
+```bash
+python3 get_keywords.py
+```
 
-### [OPTIONAL] Task 4
+**Output:**
+- `visuals/keywords_chart.png` - Bar chart of top keywords from book titles
 
-Adora Enhance envisions the final version of the pipeline working as follows:
 
-- New `.csv` files are uploaded to S3 or another object storage solution 
-- All data is stored in a single database which stores more and more information over time
-- Employees can access an analytics dashboard to explore the data and track trends
+## Running Tests
 
-Create an architecture diagram showing your design for this system. Include this diagram with your code.
+To verify the data processing functions work correctly:
 
-### [OPTIONAL] Task 5
+```bash
+pytest test_process_raw_data.py
+```
 
-Using [Tableau Public](https://public.tableau.com/app/discover), create an interactive dashboard using the cleaned data.
+Or for verbose output:
+```bash
+pytest test_process_raw_data.py -v
+```
 
-This dashboard should contain a range of well-chosen visualisations.
+## Dependencies
 
-Include a link to the live dashboard with your code.
+Key libraries used in this project:
+- **pandas**: Data manipulation and analysis
+- **altair**: Declarative statistical visualization
+- **sqlite3**: Database operations (built-in)
+- **pytest**: Testing framework
+
+See `requirements.txt` for the complete list with versions.
+
+## Troubleshooting
+
+**Issue: Database not found**
+
+Ensure the `authors.db` file exists in the project root. If missing you may need to move into the project root.
