@@ -22,7 +22,8 @@ def filter_stop_words(words: list) -> list:
                   'all', 'some', 'no', 'if', 'when', 'what', 'which', 'who',
                   'so', 'about', 'into', 'than', 'then', 'there', 'i', 'me',
                   'do', 'does', 'did', 'have', 'has', 'had', 'one', 'two', 'three', 'didn\'t',
-                  'can', 'could', 'would', 'should', 'will', 'just', 'more', '&', 'after', 'other', 'before', 'volume']
+                  'can', 'could', 'would', 'should', 'will', 'just', 'more', '&', 'after', 'other', 'before', 'volume',
+                  'like', 'over', 'also', 'up', 'down', 'out', 'such', 'only', 'very']
     filtered_words = [word.lower()
                       for word in words if word.lower() not in stop_words]
     return filtered_words
