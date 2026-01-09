@@ -5,7 +5,7 @@ import pandas as pd
 import argparse
 
 
-def read_raw_data(file_path) -> pd.DataFrame:
+def read_csv(file_path) -> pd.DataFrame:
     """Reads raw book data from a file."""
     return pd.read_csv(file_path)
 
@@ -101,7 +101,7 @@ def sort_dataframe(df: pd.DataFrame) -> pd.DataFrame:
 def process_raw_data(file_path: str) -> pd.DataFrame:
     """Processes raw book data from a CSV file and returns a cleaned DataFrame."""
     # Read raw data
-    df = read_raw_data(file_path)
+    df = read_csv(file_path)
     # Establish database connection
     conn = get_db_connection('authors.db')
     # Fetch authors data
